@@ -18,21 +18,28 @@ const path = require("path");
 
 dotenv.config();
 
-mongoose.connect(process.env.MONGO_URL, {useNewUrlParser: true, useUnifiedTopology: true}, () => {
+mongoose.connect(
+  process.env.MONGO_URL,
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  (err) => {
+    if (err) console.log(err);
     console.log("Connected to MongoDB");
-});
+  }
+);
 
 app.use("/images", express.static(path.join(__dirname, "public/images")));
 
 //middleware
-app.use(express.json()); 
+app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
-app.use(cookieSession(
-  {name:"session",
-  keys: ["ahmet"],
-  maxAge: 24 * 60 * 60 * 100,
-}));
+app.use(
+  cookieSession({
+    name: "session",
+    keys: ["ahmet"],
+    maxAge: 24 * 60 * 60 * 100,
+  })
+);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -55,12 +62,13 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors({
-  origin:"http://localhost:3000",
-  methods:"GET,POST,DELETE,PUT",
-  credentials: true,
-}));
-
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,POST,DELETE,PUT",
+    credentials: true,
+  })
+);
 
 app.use("/api/users", userRoute);
 app.use("/api/auth", authRoute);
@@ -68,7 +76,6 @@ app.use("/api/posts", postRoute);
 app.use("/api/conversations", conversationRoute);
 app.use("/api/messages", messageRoute);
 
-
-app.listen(8800,()=> {
-    console.log("Backend serveri çalışıyor")
-})
+app.listen(8800, () => {
+  console.log("Backend serveri çalışıyor");
+});
